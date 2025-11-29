@@ -1,47 +1,34 @@
-import requests
-from bs4 import BeautifulSoup
+# 🛒 E-Commerce Price Comparison Bot (Selenium Automation)
 
-headers = {"User-Agent": "Mozilla/5.0"}
+This project is a **Python Selenium-based Price Comparison Bot** that automatically searches a product on **Flipkart**, **Amazon**, and **Croma**, extracts the current prices, and displays a final comparison.
 
-def clean_price(price):
-    return float(price.replace("₹","").replace(",","").strip())
+It handles dynamic pages, popups, JavaScript-rendered content, and uses WebDriver Manager to automatically install the correct ChromeDriver.
 
-def amazon_scrape(product):
-    url = f"https://www.amazon.in/s?k={product.replace(' ','+')}"
-    res = requests.get(url, headers=headers)
-    soup = BeautifulSoup(res.text, "html.parser")
+---
 
-    item = soup.select_one("div.s-result-item")
+## 🚀 Features
 
-    if not item:
-        return None
+- 🔍 Search any product automatically  
+- 🤖 Selenium automation (Chrome WebDriver)  
+- ❌ Auto-close Flipkart login popup  
+- 🕵️ Bypass bot-detection using user-agent  
+- 💰 Extracts live prices from:
+  - Flipkart  
+  - Amazon  
+  - Croma  
+- 📊 Shows final price comparison  
+- 🛡️ Fallback extraction methods for errors  
 
-    title = item.h2.text.strip()
-    price = item.select_one(".a-price-whole")
-    if not price:
-        return None
+---
 
-    return {
-        "website": "Amazon",
-        "title": title,
-        "price": clean_price(price.text),
-        "link": "https://www.amazon.in" + item.h2.a["href"]
-    }
+## 🧰 Technologies Used
 
-def flipkart_scrape(product):
-    url = f"https://www.flipkart.com/search?q={product.replace(' ','+')}"
-    res = requests.get(url, headers=headers)
-    soup = BeautifulSoup(res.text, "html.parser")
+- Python 3  
+- Selenium  
+- WebDriver Manager  
+- Chrome WebDriver  
 
-    title = soup.select_one("div._4rR01T")
-    price = soup.select_one("div._30jeq3")
+---
 
-    if not (title and price):
-        return None
+## 📁 Project Structure
 
-    return {
-        "website": "Flipkart",
-        "title": title.text.strip(),
-        "price": clean_price(price.text),
-        "link": url
-    }
